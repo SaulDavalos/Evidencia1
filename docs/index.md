@@ -1,37 +1,80 @@
-## Welcome to GitHub Pages
+import datetime
+from collections import namedtuple
 
-You can use the [editor on GitHub](https://github.com/SaulDavalos/Evidencia1/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Registro = namedtuple("Registro", ("fecha", "nombre", "monto", "servicio")) #Tupla nominada que le dara un orden a los datos que guardamos
+diccionarioRegistros = {} #Diccionario que gauradara todos los registros donde la llave sea el folio
+servicio = {} #Un diccionario que guardara los servicios con su detalle
+monto = 0
+lista = []
+fechaRegistros = {} #Diccionario que guardara los registros donde la llave sea la fecha
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+while True:
+    print("***Menu principal***")
+    print("1-Registrar un servicio")
+    print("2-Consultar un servicio")
+    print("3-Consultar una fecha")
+    print("4-Ver todos los registros")
+    print("5-Apagar")
+    opcionMenu = int(input("Dime la opcion: "))
 
-### Markdown
+    if opcionMenu == 1:
+        fecha_capturada = input("Dame una fecha de tu servicio con el siguiente formato dd/mm/yyyy: ")
+        fecha = datetime.datetime.strptime(fecha_capturada, "%d/%m/%Y").date()
+        nombre = input("Dame tu nombre: ")
+        if diccionarioRegistros.keys():
+            folio = max(diccionarioRegistros.keys()) + 1
+        else:
+            folio = 1
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+        while True:
+            articulo = input("Dime el articulo al que le haremos el servicio: ")
+            if articulo == "":
+                print("No me has dado nada de tu articulo")
 
-```markdown
-Syntax highlighted code block
+            else:
+                descripcion_servicio = input("Dime el servicio que necesitara tu articulo: ")
+                precio = float(input("Dime el precio de tu servicio: "))
+                monto = precio + monto
+                servicio[articulo] = descripcion_servicio
 
-# Header 1
-## Header 2
-### Header 3
+            seguir = int(input("Si quieres agregar otro articulo pon 0, si quieres salir 1: "))
+            if seguir == 1:
+                break
 
-- Bulleted
-- List
+        print(f"Lo que pagaras por tus servicios sera {monto}")
+        IVA_monto = monto * .16
+        monto_IVA = monto + IVA_monto
+        print(f"El monto de lo que pagara con IVA es {monto_IVA}")
+        registro = Registro(fecha, nombre, monto, servicio)
+        diccionarioRegistros[folio] = registro
+        fechaRegistros[fecha] = registro
+        lista.append(fecha)
+        monto = 0
+        servicio = {}
 
-1. Numbered
-2. List
+    if opcionMenu == 2:
+        llave = int(input("Dame el folio del que quieres buscar: "))
+        print(f"Nombre: {diccionarioRegistros[llave].nombre}")
+        print(f"Fecha: {diccionarioRegistros[llave].fecha}")
+        print(f"Monto: {diccionarioRegistros[llave].monto}")
+        print(f"Servicio: {diccionarioRegistros[llave].servicio}")
 
-**Bold** and _Italic_ and `Code` text
+    if opcionMenu == 3:
+        fecha_ = input("Dime una fecha para buscar: ")
+        fecha_buscar = datetime.datetime.strptime(fecha_, "%d/%m/%Y").date()
+        print(f"Fecha del ticket: {fecha_buscar}\n")
+        print(f'{"Fecha":<5} | {"Nombre":<10} | {"Monto":<15} | {"Dispositivo/Servicio":<20} \n')
+        for elemento in fechaRegistros[fecha]:
+            while lista:
+                if fecha_buscar == lista[0]:
+                    print(f"{fechaRegistros[elemento].fecha} | {fechaRegistros[elemento].nombre} | {fechaRegistros[elemento].monto} | {fechaRegistros[elemento].servicio}")
+                lista.pop(0)
 
-[Link](url) and ![Image](src)
-```
+    if opcionMenu == 4:
+        print("Folio\tNombre\tFecha\tMonto\tDescripcion")
+        print("-"*100)
+        for folio in diccionarioRegistros:
+            print(f"{folio}\t{diccionarioRegistros[folio].nombre}\t{diccionarioRegistros[folio].fecha}\t{diccionarioRegistros[folio].monto}\t{diccionarioRegistros[folio].servicio}")
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/SaulDavalos/Evidencia1/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+    if opcionMenu == 5:
+        break
